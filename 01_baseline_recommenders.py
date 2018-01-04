@@ -1,4 +1,3 @@
-# FINAL PROJECT
 # Baseline recommenders:
 # First, implement two simple baseline algorithms against which you compare your more sophisticated recommenders:
 # one that recommends randomly selected artists the target user has not listened to before and
