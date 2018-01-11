@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+.data/
 
 C1ku_idx_artists.txt
 C1ku_idx_users.txt
