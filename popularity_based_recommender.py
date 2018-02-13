@@ -36,22 +36,28 @@ def read_from_file(filename):
     f.close()
     return data
 
-UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
+# UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 K = 10 # number of recommendations
 
 
-def recommend_PB():
+def recommend_PB(UAM, train, K):
+
+    UAM[:,train] = 0.0    
 
     amount_artists = UAM.shape[1]
-    UAM_sum = np.sum(UAM, axis=0)
+
+    if K > amount_artists - len(train):
+        K = amount_artists - len(train)
+
+    
     
     listening_events_per_artist = np.sum(UAM, axis=0)                                    
     recommended_artists_idx = np.argsort(listening_events_per_artist)[-K:]                        
     top_recommendations = np.flipud(recommended_artists_idx)
-    sum = UAM_sum[top_recommendations]
-    print "top recommendations: "
-    print(top_recommendations)
+    sum = listening_events_per_artist[top_recommendations]
+    # print "top recommendations: "
+    # print(top_recommendations)
 
     return len(top_recommendations)
 
-recommend_PB()
+# recommend_PB()

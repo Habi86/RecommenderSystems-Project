@@ -14,8 +14,7 @@ import random
 import scipy.spatial.distance as scidist        # import distance computation module from scipy package
 from operator import itemgetter                 # for sorting dictionaries w.r.t. values
 
-# Parameters
-ROOT_DIR = "./data/"
+# Parameters ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
 ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"       # artist names for UAM
 USERS_FILE = ROOT_DIR + "LFM1b_users.txt"           # user names for UAM

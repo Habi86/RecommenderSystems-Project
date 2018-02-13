@@ -16,6 +16,8 @@ from operator import itemgetter                 # for sorting dictionaries w.r.t
 from collections import defaultdict
 
 
+
+
 # Parameters
 ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
@@ -24,8 +26,8 @@ USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
 AAM_FILE = ROOT_DIR + "AAM.txt"                # artist-artist similarity matrix (AAM)
 METHOD = "PB"                       # recommendation method
                                     # ["RB", "PB", "CF", "CB", "HR_RB", "HR_SCB"]
-NF = 2              # number of folds to perform in cross-validation
-VERBOSE = False     # verbose output?
+NF = 10              # number of folds to perform in cross-validation
+
 
 # Function to read metadata (users or artists)
 def read_from_file(filename):
@@ -40,23 +42,28 @@ def read_from_file(filename):
     return data
 
 
-UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 
 
 
-def recommend_CF(user):
 
-    user_playcount = UAM[user, :]
-    # Get seed user's artists listened to
-    u_aidx = np.nonzero(UAM[user, :])[0]
+def recommend_CF(user, copy_UAM, train, K):
+    
+    user_playcount = copy_UAM[user, :]
+    # Remove information on test artists from user
+    # user_playcount = np.nonzero(user_playcount)[0]
+    test_artists = np.setdiff1d(user_playcount, train)
+    test_artists = map(int, test_artists)
+
+    copy_UAM[user, test_artists] = 0.0
 
    
-    users = np.zeros(shape=(UAM.shape[0]), dtype=np.float32)
-    UAM[user,:] = UAM[user,:] / np.sum(UAM[user,:])
+    users = np.zeros(shape=(copy_UAM.shape[0]), dtype=np.float32)
+    # users playcounts normalisieren
+    copy_UAM[user,:] = copy_UAM[user,:] / np.sum(copy_UAM[user,:])
 
     # Compute similarities as inverse cosine distance between user_playcount of user and all users via UAM (assuming that UAM is normalized)
-    for u in range(0, UAM.shape[0]):
-        users[u] = 1.0 - scidist.cosine(user_playcount, UAM[u,:])
+    for u in range(0, copy_UAM.shape[0]):
+        users[u] = 1.0 - scidist.cosine(user_playcount, copy_UAM[u,:])
         # print "user u: "
         # print users[u]
 
@@ -64,15 +71,17 @@ def recommend_CF(user):
     sort_idx = np.argsort(users) 
 
     
-    multiple_neighbours(sort_idx, 10)
-    simple_neighbour(sort_idx)
+    recommended_artist = multiple_neighbours(sort_idx, K, copy_UAM)
+    simple_neighbour(sort_idx, copy_UAM)
+
+    return recommended_artist
 
 
 
-def multiple_neighbours(sort_idx, K):
+def multiple_neighbours(sort_idx, K, copy_UAM):
     neighbor_idx = sort_idx[-1-K:-1]
 
-    artists_of_neighbours = UAM[neighbor_idx, :]
+    artists_of_neighbours = copy_UAM[neighbor_idx, :]
 
     artist_dictionary = defaultdict(list)
     for user in artists_of_neighbours:
@@ -84,34 +93,38 @@ def multiple_neighbours(sort_idx, K):
                 artist_dictionary[key] = value
     
     # sortierte artist_list, in der die ersten eintraege die sind, die bei meinen nachbarn am oeftesten vorkommen
-    artist_list = sorted(artist_dictionary, key=lambda value: artist_dictionary[value], reverse=True)
+    artist_list = sorted(artist_dictionary, key=artist_dictionary.get, reverse=True)
     # print "artist_dictionary"
     # print artist_dictionary
 
-    recommended_artist_of_multiple_neighbours = artist_list[0]
+    # print "hoechster artist-value "
+    # print artist_dictionary[artist_list[0]]
 
-    print "recommended artist of multiple neighbours"
-    print recommended_artist_of_multiple_neighbours
+    recommended_artist_of_multiple_neighbours = artist_list[0:10]
+
+    # print "recommended artist of multiple neighbours"
+    # print recommended_artist_of_multiple_neighbours
 
     return recommended_artist_of_multiple_neighbours
 
     
     
-def simple_neighbour(sort_idx):
+def simple_neighbour(sort_idx, copy_UAM):
     neighbor_idx = sort_idx[-2]
 
-    artists_of_neighbour = UAM[neighbor_idx, :]
-    print "artists of neighbour"
-    print artists_of_neighbour
+    artists_of_neighbour = copy_UAM[neighbor_idx, :]
+    # print "artists of neighbour"
+    # print artists_of_neighbour
 
     artist_list = sorted(artists_of_neighbour, reverse=True)
-    recommended_artist_of_simple_neighbour = artist_list[0]
+    recommended_artist_of_simple_neighbour = artist_list[0:10]
+    
 
-    print "recommended artist of simple neighbour: "
-    print recommended_artist_of_simple_neighbour
+    # print "recommended artist of simple neighbour: "
+    # print recommended_artist_of_simple_neighbour
     return recommended_artist_of_simple_neighbour
 
 
 
-recommend_CF(5)
+#recommend_CF(5)
 
