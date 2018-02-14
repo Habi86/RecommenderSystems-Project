@@ -21,8 +21,8 @@ USERS_FILE = ROOT_DIR + "LFM1b_users.txt"           # user names for UAM
 METHOD = "RB"                                       # recommendation method
                                                     # ["RB", "PB", "CF", "CB", "HR_RB", "HR_SCB"]
 
-NF = 2              # number of folds to perform in cross-validation
-VERBOSE = True      # verbose output?
+NF = 2               # number of folds to perform in cross-validation
+VERBOSE = False      # verbose output?
 
 # Function to read metadata (users or artists)
 def read_from_file(filename):
@@ -103,6 +103,7 @@ def run():
         # Split user's artists into train and test set for cross-fold (CV) validation
         fold = 0
         kf = cross_validation.KFold(len(u_aidx), n_folds=NF)  # create folds (splits) for 5-fold CV
+
         for train_aidx, test_aidx in kf:  # for all folds
             # Show progress
             if VERBOSE :
@@ -120,7 +121,7 @@ def run():
             #K_CF = 3           # for CF: number of nearest neighbors to consider for each user
             #K_HR = 10          # for hybrid: number of artists to recommend at most
             if METHOD == "RB":          # random baseline
-#                dict_rec_aidx = recommend_RB(np.setdiff1d(range(0, no_artists), u_aidx[train_aidx]), K_RB) # len(test_aidx))
+#               dict_rec_aidx = recommend_RB(np.setdiff1d(range(0, no_artists), u_aidx[train_aidx]), K_RB) # len(test_aidx))
                 N = 100
                 dict_rec_aidx = recommend_RB_user(UAM, u_aidx[train_aidx], N, K_RB) # len(test_aidx))
                 #...
