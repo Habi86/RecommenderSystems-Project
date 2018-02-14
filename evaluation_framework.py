@@ -6,9 +6,10 @@ import random
 import scipy.spatial.distance as scidist        # import distance computation module from scipy package
 from operator import itemgetter                 # for sorting dictionaries w.r.t. values
 from collections import defaultdict
+import baseline_recommenders
 import collaborative_filtering
 import popularity_based_recommender
-import hybrid_CF_PB
+#import hybrid_CF_PB
 from sklearn.model_selection import KFold
 
 # Parameters
@@ -21,7 +22,8 @@ AAM_FILE = ROOT_DIR + "AAM.txt"                # artist-artist similarity matrix
 
 NF = 10              # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
-
+amount_users = UAM.shape[0]
+amount_artists = UAM.shape[1]
 
 K = 10 # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
@@ -35,8 +37,8 @@ def evaluation_framework(method):
 
     for number_recommended_items in recommended_items_list:
         
-        avg_precision = 0;       # mean precision
-        avg_recall = 0;        # mean recall
+        avg_precision = 0.0       # mean precision
+        avg_recall = 0.0        # mean recall
         
         for user in sample_users:
             print "user: "
@@ -83,6 +85,15 @@ def evaluation_framework(method):
                     recommended_artists = popularity_based_recommender.recommend_PB(train_UAM, number_recommended_items)
                 elif method == "CF_PB":
                     recommended_artists = hybrid_CF_PB.recommend_CF_PB(user, train_UAM, K, number_recommended_items)
+
+                elif method == "RB_A":
+                    recommended_artists = baseline_recommenders.recommend_RB_artist(np.setdiff1d(range(0, amount_artists), user_row[train]), K)
+
+                elif method == "RB_U":
+                    N = 100
+                    recommended_artists = baseline_recommenders.recommend_RB_user(train_UAM, user_row[train], N, K)
+
+
 
                 # print "recommended_artists: "
                 # print recommended_artists
@@ -136,10 +147,13 @@ def evaluation_framework(method):
         print prec_array
         print "average recall: "
         print rec_array
+        print "average f1: "
+        print f1_measure
+
         
 
 
-evaluation_framework("CF")
+evaluation_framework("RB_A")
 
 
 
