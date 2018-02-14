@@ -6,11 +6,6 @@
 # e.g., cosine similarity on term weight vectors, co-occurrence likelihood, or set-based Jaccard index.
 # Finally, build a content-based recommender using the similarity matrix created.
 
-####################
-####################
-# WIKIPEDIA FETCHER
-####################
-####################
 # Wikipedia fetcher to download "music context" data for a given artist list.
 __author__ = 'Markus Schedl' # modified
 
@@ -24,7 +19,7 @@ import random
 WIKIPEDIA_URL = "http://en.wikipedia.org/wiki/"
 
 ARTISTS_FILE = "./data/LFM1b_artists.txt"                   # text file containing Last.fm user names
-OUTPUT_DIRECTORY = "./data/wikipedia/crawls_wikipedia_"     # directory to write output to
+OUTPUT_DIRECTORY = "./data/wikipedia/crawls_wikipedia"      # directory to write output to
 
 USE_INDEX_IN_OUTPUT_FILE = True             # use [index].html as output file name (if set to False, the url-encoded artist name is used)
 SKIP_EXISTING_FILES = True                  # skip files already retrieved
@@ -55,6 +50,7 @@ def fetch_wikipedia_page(query):
         return ""
 
 
+
 # Main program
 if __name__ == '__main__':
 
@@ -64,7 +60,7 @@ if __name__ == '__main__':
 
     # Read artist list
     artists = read_file(ARTISTS_FILE)
-    artistsSample = []
+    artistsSample = [] #TODO RENAME ME 4 all artists
 
     for i in range(0, 100):
         artistsSample.append(random.choice(artists))
@@ -72,21 +68,21 @@ if __name__ == '__main__':
     # Retrieve Wikipedia pages for all artists
     # Either use index as output file name
     if USE_INDEX_IN_OUTPUT_FILE:
-        for i in range(0, len(artists)):
+        for i in range(0, len(artistsSample)):
             html_fn = OUTPUT_DIRECTORY + "/" + str(i) + ".html"     # target file name
             # check if file already exists
             if os.path.exists(html_fn) & SKIP_EXISTING_FILES:       # if so and it should be skipped, skip the file
                 print "File already fetched: " + html_fn
                 continue
             # otherwise, fetch HTML content
-            html_content = fetch_wikipedia_page(artists[i])
+            html_content = fetch_wikipedia_page(artistsSample[i])
             # write to output file
             print "Storing content to " + html_fn
             with open(html_fn, 'w') as f:
                 f.write(html_content)
     else:
         # Or use url-encoded artist name
-        for a in artists:
+        for a in artistsSample:
             html_fn = OUTPUT_DIRECTORY + "/" + urllib.quote(a) + ".html"     # target file name
             # check if file already exists
             if os.path.exists(html_fn) & SKIP_EXISTING_FILES:       # if so and it should be skipped, skip the file
@@ -98,7 +94,6 @@ if __name__ == '__main__':
             print "Storing content to " + html_fn
             with open(html_fn, 'w') as f:
                 f.write(html_content)
-
 
 
 
