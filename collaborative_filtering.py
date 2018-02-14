@@ -46,46 +46,42 @@ def read_from_file(filename):
 
 
 
-def recommend_CF(user, copy_UAM, train, K):
+def recommend_CF(user, UAM, K, number_recommended_items):
     
-    user_playcount = copy_UAM[user, :]
-    # Remove information on test artists from user
-    # user_playcount = np.nonzero(user_playcount)[0]
-    test_artists = np.setdiff1d(user_playcount, train)
-    test_artists = map(int, test_artists)
-
-    copy_UAM[user, test_artists] = 0.0
-
+    artists_of_user = UAM[user, :]
    
-    users = np.zeros(shape=(copy_UAM.shape[0]), dtype=np.float32)
+    similar_users = np.zeros(shape=(UAM.shape[0]), dtype=np.float32)
     # users playcounts normalisieren
-    copy_UAM[user,:] = copy_UAM[user,:] / np.sum(copy_UAM[user,:])
+
+    UAM[user,:] = UAM[user,:] / np.sum(UAM[user,:])
+
 
     # Compute similarities as inverse cosine distance between user_playcount of user and all users via UAM (assuming that UAM is normalized)
-    for u in range(0, copy_UAM.shape[0]):
-        users[u] = 1.0 - scidist.cosine(user_playcount, copy_UAM[u,:])
-        # print "user u: "
-        # print users[u]
+    for u in range(0, UAM.shape[0]):
+        similar_users[u] = 1.0 - scidist.cosine(artists_of_user, UAM[u,:])
 
     # similarity der user absteigend sortieren
-    sort_idx = np.argsort(users) 
+    sorted_users_idx = np.argsort(similar_users)
 
     
-    recommended_artist = multiple_neighbours(sort_idx, K, copy_UAM)
-    simple_neighbour(sort_idx, copy_UAM)
-
+    recommended_artist = multiple_neighbours(sorted_users_idx, K, UAM, number_recommended_items)
+    # simple_neighbour(sorted_users_idx, copy_UAM)
+    # print "werte: "
+    # print copy_UAM[7,29]
+    # print "recommended artists: "
+    # print recommended_artist
     return recommended_artist
 
 
 
-def multiple_neighbours(sort_idx, K, copy_UAM):
-    neighbor_idx = sort_idx[-1-K:-1]
+def multiple_neighbours(sorted_users_idx, K, UAM, number_recommended_items):
+    neighbor_idx = sorted_users_idx[-1-K:-1]
 
-    artists_of_neighbours = copy_UAM[neighbor_idx, :]
+    artists_of_neighbours = UAM[neighbor_idx, :]
 
     artist_dictionary = defaultdict(list)
-    for user in artists_of_neighbours:
-        for key, value in enumerate(user):
+    for neighbor_row in artists_of_neighbours:
+        for key, value in enumerate(neighbor_row):
             if(value == 0): continue
             if(artist_dictionary[key]):
                 artist_dictionary[key] = artist_dictionary[key] + value
@@ -94,13 +90,13 @@ def multiple_neighbours(sort_idx, K, copy_UAM):
     
     # sortierte artist_list, in der die ersten eintraege die sind, die bei meinen nachbarn am oeftesten vorkommen
     artist_list = sorted(artist_dictionary, key=artist_dictionary.get, reverse=True)
-    # print "artist_dictionary"
-    # print artist_dictionary
+    # print "artist_list"
+    # print artist_list
 
     # print "hoechster artist-value "
     # print artist_dictionary[artist_list[0]]
 
-    recommended_artist_of_multiple_neighbours = artist_list[0:10]
+    recommended_artist_of_multiple_neighbours = artist_list[0:number_recommended_items]
 
     # print "recommended artist of multiple neighbours"
     # print recommended_artist_of_multiple_neighbours
