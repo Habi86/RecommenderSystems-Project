@@ -16,7 +16,7 @@ import csv
 import random
 
 # Parameters
-WIKIPEDIA_URL = "http://en.wikipedia.org/wiki/"
+WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/"
 
 ARTISTS_FILE = "./data/LFM1b_artists.txt"                   # text file containing Last.fm user names
 OUTPUT_DIRECTORY = "./data/wikipedia/crawls_wikipedia"      # directory to write output to
@@ -60,68 +60,23 @@ if __name__ == '__main__':
 
     # Read artist list
     artists = read_file(ARTISTS_FILE)
-    artistsSample = [] #TODO RENAME ME 4 all artists
+    #artistsSample = [] #TODO RENAME ME 4 all artists
 
-    for i in range(0, 100):
-        artistsSample.append(random.choice(artists))
+    # for i in range(0, 10):
+    #     artistsSample.append(random.choice(artists))
 
     # Retrieve Wikipedia pages for all artists
-    # Either use index as output file name
-    if USE_INDEX_IN_OUTPUT_FILE:
-        for i in range(0, len(artistsSample)):
-            html_fn = OUTPUT_DIRECTORY + "/" + str(i) + ".html"     # target file name
-            # check if file already exists
-            if os.path.exists(html_fn) & SKIP_EXISTING_FILES:       # if so and it should be skipped, skip the file
-                print "File already fetched: " + html_fn
-                continue
-            # otherwise, fetch HTML content
-            html_content = fetch_wikipedia_page(artistsSample[i])
-            # write to output file
-            print "Storing content to " + html_fn
-            with open(html_fn, 'w') as f:
-                f.write(html_content)
-    else:
-        # Or use url-encoded artist name
-        for a in artistsSample:
-            html_fn = OUTPUT_DIRECTORY + "/" + urllib.quote(a) + ".html"     # target file name
-            # check if file already exists
-            if os.path.exists(html_fn) & SKIP_EXISTING_FILES:       # if so and it should be skipped, skip the file
-                print "File already fetched: " + html_fn
-                continue
-            # otherwise, fetch HTML content
-            html_content = fetch_wikipedia_page(a)
-            # write to output file
-            print "Storing content to " + html_fn
-            with open(html_fn, 'w') as f:
-                f.write(html_content)
+    for i in range(0, len(artists)):
+        html_fn = OUTPUT_DIRECTORY + "/" + str(i) + ".html"     # target file name
+        # check if file already exists
+        if os.path.exists(html_fn) & SKIP_EXISTING_FILES:       # if so and it should be skipped, skip the file
+            print "File already fetched: " + html_fn
+            continue
+        # otherwise, fetch HTML content
+        html_content = fetch_wikipedia_page(artists[i])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if "Wikipedia does not have an article with this exact name" not in html_content:
+            if "may refer to" not in html_content:            # write to output file
+                print "Storing content to " + html_fn
+                with open(html_fn, 'w') as f:
+                    f.write(html_content)
