@@ -9,7 +9,8 @@ from collections import defaultdict
 import baseline_recommenders
 import collaborative_filtering
 import popularity_based_recommender
-#import hybrid_CF_PB
+import hybrid_CF_PB
+import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
 # Parameters
@@ -25,12 +26,13 @@ UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
 
-K = 10 # number of neighbours
+K = 20 # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
-recommended_items_list = [10, 25, 50]
+recommended_items_list = range(0, 500, 10)
 def evaluation_framework(method):
     prec_array = []
     rec_array = []
+    f1_array = []
     # sample_users = random.sample(range(0, UAM.shape[0]), 15)
     sample_users = range(20, 25)
 
@@ -54,13 +56,12 @@ def evaluation_framework(method):
                 
 
             
-            # create folds
-            kf = KFold(n_splits=NF)
-            # folds = cross_validation.KFold(len(user_row), n_folds=NF)
 
-            # split into train and test set
-            # for train, test in folds:
-            for train, test in kf.split(user_row):
+            # kf = KFold(n_splits=NF)
+            # for train, test in kf.split(user_row):
+            folds = cross_validation.KFold(len(user_row), n_folds=NF)
+            for train, test in folds:
+            
                 # np.set_printoptions(threshold=np.nan)
                 # print "test: "
                 # print test
@@ -114,8 +115,9 @@ def evaluation_framework(method):
 
                 true_positives = len(correct_predicted_artists)
 
-                # print "true positives: "
-                # print true_positives
+                print "true positives: "
+                print true_positives
+                print len(recommended_artists)
                 # raise "x"
                 # wenn kein einziger artist empfohlen wird, precision = 100%
                 if(len(recommended_artists) == 0):
@@ -140,6 +142,7 @@ def evaluation_framework(method):
 
         
         f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
+        f1_array.append(f1_measure)
         rec_array.append(avg_recall)
         prec_array.append(avg_precision)
 
@@ -147,13 +150,25 @@ def evaluation_framework(method):
         print prec_array
         print "average recall: "
         print rec_array
-        print "average f1: "
-        print f1_measure
+        print "f1: "
+        print f1_array
+        # print "average f1: "
+        # print f1_measure
+    
+    np.savetxt('./plots/data/'+method+'_precision.txt', prec_array, delimiter=',')
+    np.savetxt('./plots/data/'+method+'_recall.txt', rec_array, delimiter=',')
+    np.savetxt('./plots/data/'+method+'_f1.txt', f1_array, delimiter=',')
+    # print np.loadtxt('./plots/data/cf-precision.txt', delimiter=',')
+
 
         
 
 
-evaluation_framework("RB_A")
+
+
+# plot_precision_recall()
+evaluation_framework("CF")
+
 
 
 
