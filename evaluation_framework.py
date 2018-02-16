@@ -10,6 +10,7 @@ import baseline_recommenders
 import collaborative_filtering
 import popularity_based_recommender
 import hybrid_CF_PB
+import content_based
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
@@ -23,26 +24,33 @@ AAM_FILE = ROOT_DIR + "AAM.txt"                # artist-artist similarity matrix
 
 NF = 10              # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
+AAM = np.loadtxt(AAM_FILE, delimiter='\t', dtype=np.float32)
+
 amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
 
-K = 20 # number of neighbours
+K = 10 # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
-recommended_items_list = range(0, 500, 10)
+recommended_items_list = range(10, 200, 10)
 def evaluation_framework(method):
     prec_array = []
     rec_array = []
     f1_array = []
+    tp_array = []
     # sample_users = random.sample(range(0, UAM.shape[0]), 15)
     sample_users = range(20, 25)
 
 
     for number_recommended_items in recommended_items_list:
         
+        
         avg_precision = 0.0       # mean precision
         avg_recall = 0.0        # mean recall
+        tp = 0
         
         for user in sample_users:
+            print "number recommended items: "
+            print number_recommended_items
             print "user: "
             print user
 
@@ -53,9 +61,6 @@ def evaluation_framework(method):
             # print user_row
 
             if len(user_row)< 10: continue
-                
-
-            
 
             # kf = KFold(n_splits=NF)
             # for train, test in kf.split(user_row):
@@ -76,6 +81,14 @@ def evaluation_framework(method):
                 train_UAM = UAM.copy()
                 train_UAM[user, test] = 0.0
 
+                # print (len(UAM[user, :]) - len(user_row))
+                # print len(np.where(UAM[user, :] == 0)[0])
+
+                # print "train_uam: "
+                # print len(np.where(train_UAM[user, :] == 0)[0])
+                
+
+
                 if method == "CF":
                     # try: 
                     recommended_artists = collaborative_filtering.recommend_CF(user, train_UAM, K, number_recommended_items)
@@ -83,18 +96,25 @@ def evaluation_framework(method):
                     #     recommended_artists = []
                     #     continue
                 elif method == "PB":
-                    recommended_artists = popularity_based_recommender.recommend_PB(train_UAM, number_recommended_items)
+                    recommended_artists = popularity_based_recommender.recommend_PB(train_UAM, user, number_recommended_items)
                 elif method == "CF_PB":
                     recommended_artists = hybrid_CF_PB.recommend_CF_PB(user, train_UAM, K, number_recommended_items)
-
                 elif method == "RB_A":
-                    recommended_artists = baseline_recommenders.recommend_RB_artist(np.setdiff1d(range(0, amount_artists), user_row[train]), K)
+                    recommended_artists = baseline_recommenders.recommend_RB_artist(train_UAM, user, number_recommended_items)
 
                 elif method == "RB_U":
-                    N = 100
-                    recommended_artists = baseline_recommenders.recommend_RB_user(train_UAM, user_row[train], N, K)
+                    recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
+                elif method == "CB":
+                    recommended_artists = content_based.recommend_CB(AAM_FILE, user_row[train], number_recommended_items, K)
 
 
+                # print recommended_artists
+                recommended_artists = np.array(recommended_artists)
+                # print recommended_artists
+
+                # print np.nonzero(UAM[user, :])[0]
+                # print user_row[test]
+                # raise "x"
 
                 # print "recommended_artists: "
                 # print recommended_artists
@@ -110,70 +130,75 @@ def evaluation_framework(method):
                 # print train
                 # print "test: "
                 # print test
+                # print "user_row[test]"
+                # print user_row[test]
+
+
                 
                 correct_predicted_artists = np.intersect1d(user_row[test], recommended_artists)
+                # correct_predicted_artists = np.intersect1d(train_UAM[user, test], recommended_artists)
+
+
+                print recommended_artists
+                print user_row[test]
+                print np.nonzero(UAM[user, test])[0]
+                raise "x"
 
                 true_positives = len(correct_predicted_artists)
+                tp = tp + true_positives
+                
 
-                print "true positives: "
-                print true_positives
-                print len(recommended_artists)
-                # raise "x"
+                # print "true positives: "
+                # print true_positives
+                # print len(recommended_artists)
+
                 # wenn kein einziger artist empfohlen wird, precision = 100%
                 if(len(recommended_artists) == 0):
                     precision = 100.0
                 else:
                     precision = 100.0 * true_positives / len(recommended_artists)
 
-                print "precision: "
-                print precision
+                # print "precision: "
+                # print precision
                 # wenn kein einziger artist im test set vorkommt, recall = 100%
                 if(len(test) == 0):
                     recall = 100.0
                 else:
                     recall = 100.0 * true_positives / len(test)
-                print "len(test): "
-                print len(test)
-                print "recall: "
-                print recall
+                # print "len(test): "
+                # print len(test)
+                # print "recall: "
+                # print recall
                 # add precision and recall for current user and fold to aggregate variables
                 avg_precision += precision / (NF * len(sample_users))
                 avg_recall += recall / (NF * len(sample_users))
 
         
-        f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
+        if (avg_precision + avg_recall) != 0: f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
+        else: f1_measure = 0.0
         f1_array.append(f1_measure)
         rec_array.append(avg_recall)
         prec_array.append(avg_precision)
+        tp_array.append(tp)
 
         print "average precision: "
         print prec_array
         print "average recall: "
         print rec_array
-        print "f1: "
+        print "average f1: "
         print f1_array
-        # print "average f1: "
-        # print f1_measure
+        print "tp_array: "
+        print tp_array
+
     
     np.savetxt('./plots/data/'+method+'_precision.txt', prec_array, delimiter=',')
     np.savetxt('./plots/data/'+method+'_recall.txt', rec_array, delimiter=',')
     np.savetxt('./plots/data/'+method+'_f1.txt', f1_array, delimiter=',')
-    # print np.loadtxt('./plots/data/cf-precision.txt', delimiter=',')
+    print "Done saving to file"
 
 
         
 
 
-
-
 # plot_precision_recall()
-evaluation_framework("CF")
-
-
-
-
-
-# CF:
-# K = 3: 
-# PRECISION LIST: 
-# python evaluation_framework.py > ergebnisse_CF_5.txt
+evaluation_framework("CB")

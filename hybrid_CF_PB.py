@@ -10,21 +10,22 @@ import popularity_based_recommender
 
 
 def recommend_CF_PB(user, UAM, K, number_recommended_items):
-  cf = collaborative_filtering.recommend_CF(user, UAM, K, 100)
-  pb = popularity_based_recommender.recommend_PB(UAM, 100)
+  cf_artist_indizes = collaborative_filtering.recommend_CF(user, UAM, K, 100)
+  pb_artist_indizes = popularity_based_recommender.recommend_PB(UAM, 100)
 
   ranked_indizes_dictionary = defaultdict(list)
-  for key, value in enumerate(cf):
-    pb_index = np.where(pb == value)[0]
 
+  
+  for cf_index, value in enumerate(cf_artist_indizes):
+    pb_index = np.where(pb_artist_indizes == value)[0]
     if (pb_index.size):
         pb_index = pb_index[0]
-    else: pb_index = len(pb)
+    else: pb_index = len(pb_artist_indizes)
 
-    ranked_indizes_dictionary[value] = pb_index + key
+    ranked_indizes_dictionary[value] = pb_index + cf_index
     
-    ranked_indizes = sorted(ranked_indizes_dictionary, key=ranked_indizes_dictionary.get, reverse=True)
-    
+    ranked_indizes = sorted(ranked_indizes_dictionary, key=ranked_indizes_dictionary.get)
+
   return ranked_indizes[0:number_recommended_items]
 
 

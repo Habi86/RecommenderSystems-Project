@@ -11,30 +11,42 @@ def plot_precision_recall():
     precision_cf_pb = np.loadtxt('./plots/data/CF_PB_precision.txt', delimiter=',')
     recall_cf_pb = np.loadtxt('./plots/data/CF_PB_recall.txt', delimiter=',')
 
+    precision_rb_u = np.loadtxt('./plots/data/RB_U_precision.txt', delimiter=',')
+    recall_rb_u = np.loadtxt('./plots/data/RB_U_recall.txt', delimiter=',')
+
+    precision_rb_a = np.loadtxt('./plots/data/RB_A_precision.txt', delimiter=',')
+    recall_rb_a = np.loadtxt('./plots/data/RB_A_recall.txt', delimiter=',')
+
 
     plt1 = plt.figure()
     precision_recall_plot = plt1.add_subplot(211)
     precision_recall_plot.plot(recall_pb, precision_pb)
     precision_recall_plot.plot(recall_cf, precision_cf)
     precision_recall_plot.plot(recall_cf_pb, precision_cf_pb)
+    precision_recall_plot.plot(recall_rb_u, precision_rb_u)
+    precision_recall_plot.plot(recall_rb_a, precision_rb_a)
 
-    plt.legend(['PB', 'CF', 'CF_PB'], loc='upper right')
-    plt1.savefig('./plots/precision-recall.png')
+    plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A'], loc='upper right')
+    plt1.savefig('./plots/precision-recall_neu.png')
 
 def plot_f1():
-  number_recommended_artists = range(10, 500, 10)
+  number_recommended_artists = range(10, 200, 10)
   f1_pb = np.loadtxt('./plots/data/PB_f1.txt', delimiter=',')
   f1_cf = np.loadtxt('./plots/data/CF_f1.txt', delimiter=',')
   f1_cf_pb = np.loadtxt('./plots/data/CF_PB_f1.txt', delimiter=',')
+  f1_rb_u = np.loadtxt('./plots/data/RB_U_f1.txt', delimiter=',')
+  f1_rb_a = np.loadtxt('./plots/data/RB_A_f1.txt', delimiter=',')
 
   plt1 = plt.figure()
   f1_plot = plt1.add_subplot(211)
   f1_plot.plot(number_recommended_artists, f1_pb)
   f1_plot.plot(number_recommended_artists, f1_cf)
   f1_plot.plot(number_recommended_artists, f1_cf_pb)
+  f1_plot.plot(number_recommended_artists, f1_rb_u)
+  f1_plot.plot(number_recommended_artists, f1_rb_a)
 
-  plt.legend(['PB', 'CF', 'CF_PB'], loc='upper right')
-  plt1.savefig('./plots/f1.png')
+  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A'], loc='upper right')
+  plt1.savefig('./plots/f1_neu.png')
 
 
 plot_precision_recall()
