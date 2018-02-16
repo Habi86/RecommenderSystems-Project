@@ -11,7 +11,6 @@ import collaborative_filtering
 import popularity_based_recommender
 import content_based_recommender
 import hybrid_CF_PB
-import content_based
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
@@ -20,12 +19,11 @@ ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
 ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"    # artist names for UAM
 USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
-AAM_FILE = ROOT_DIR + "wikipedia/AAM.txt"                # artist-artist similarity matrix (AAM)
 
 
 NF = 10              # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
-AAM = np.loadtxt(AAM_FILE, delimiter='\t', dtype=np.float32)
+
 
 amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
@@ -143,10 +141,10 @@ def evaluation_framework(method):
                 # correct_predicted_artists = np.intersect1d(train_UAM[user, test], recommended_artists)
 
 
-                print recommended_artists
-                print user_row[test]
-                print np.nonzero(UAM[user, test])[0]
-                raise "x"
+                # print recommended_artists
+                # print user_row[test]
+                # print np.nonzero(UAM[user, test])[0]
+
 
                 true_positives = len(correct_predicted_artists)
                 tp = tp + true_positives
