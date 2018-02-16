@@ -9,6 +9,7 @@ from collections import defaultdict
 import baseline_recommenders
 import collaborative_filtering
 import popularity_based_recommender
+import content_based_recommender
 import hybrid_CF_PB
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
@@ -18,11 +19,12 @@ ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
 ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"    # artist names for UAM
 USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
-AAM_FILE = ROOT_DIR + "AAM.txt"                # artist-artist similarity matrix (AAM)
+AAM_FILE = ROOT_DIR + "wikipedia/AAM.txt"                # artist-artist similarity matrix (AAM)
 
 
 NF = 10              # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
+AAM = np.loadtxt(AAM_FILE, delimiter='\t', dtype=np.float32)
 amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
 
@@ -94,7 +96,8 @@ def evaluation_framework(method):
                     N = 100
                     recommended_artists = baseline_recommenders.recommend_RB_user(train_UAM, user_row[train], N, K)
 
-
+                elif method == "CB":
+                    recommended_artists = content_based_recommender.recommend_CB(AAM, user_row[train], K, number_recommended_items)
 
                 # print "recommended_artists: "
                 # print recommended_artists
@@ -167,7 +170,7 @@ def evaluation_framework(method):
 
 
 # plot_precision_recall()
-evaluation_framework("CF")
+evaluation_framework("CB")
 
 
 
