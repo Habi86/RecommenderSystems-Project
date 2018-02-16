@@ -70,11 +70,12 @@ if __name__ == '__main__':
     term_list = []
 
     # read artist names from file
-    artists = Wikipedia_Fetcher.read_file(Wikipedia_Fetcher.ARTISTS_UAMONLY)   # using functions and parameters defined in Wikipedia_Fetcher
+    artists = Wikipedia_Fetcher.read_file(Wikipedia_Fetcher.IDX_ARTISTS_FILE)   # using functions and parameters defined in Wikipedia_Fetcher
+    artists_len = len(artists)
 
     # for all artists
-    #for i in range(0, len(artists)):
-    for i in range(0, 2):
+    for i in range(0, len(artists)):
+    #for i in range(0, 2):
         # construct file name to fetched HTML page for current artist, depending on parameter settings in Wikipedia_Fetcher
         html_fn = Wikipedia_Fetcher.OUTPUT_DIRECTORY + "/" + artists[i][0] + ".html"     # target file name
 
@@ -115,14 +116,15 @@ if __name__ == '__main__':
 
 
     # Compute number of artists/documents and terms
-    no_artists = len(html_contents.items())
+    #no_artists = len(html_contents.items())
+    no_artists = artists_len
     no_terms = len(terms_df)
     print "Number of artists in corpus: " + str(no_artists)
     print "Number of terms in corpus: " + str(no_terms)
 
     # You may want (or need) to perform some kind of dimensionality reduction here, e.g., filtering all terms with a very small document frequency.
     # ... TODO
-    term_list = filter(lambda t: terms_df[t] != 1, terms_df)
+    #term_list = filter(lambda t: terms_df[t] != 1, terms_df)       #wirft spaeter out of range
     #print len(term_list)
 
 
@@ -142,6 +144,7 @@ if __name__ == '__main__':
     # Iterate over all (artist, terms) tuples to determine all term frequencies TF_{artist,term}
     terms_index_lookup = {}         # lookup table for indices (for higher efficiency)
     for a_idx, terms in html_contents.items():
+
         print "Computing term weights for artist " + str(a_idx)
         # You may want (or need) to make the following more efficient.
         for t in terms:                     # iterate over all terms of current artist
