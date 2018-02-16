@@ -7,8 +7,7 @@ import numpy as np
 import scipy.spatial.distance as scidist      # import distance computation module from scipy package
 import urllib
 import content_based_Wikipedia_Fetcher as Wikipedia_Fetcher
-#https://stackoverflow.com/questions/3073881/clean-up-html-in-python
-from lxml.html.clean import Cleaner
+from lxml.html.clean import Cleaner #https://stackoverflow.com/questions/3073881/clean-up-html-in-python
 
 
 # Parameters
@@ -22,22 +21,22 @@ STOP_WORDS = ["a", "about", "above", "after", "again", "against", "all", "am", "
 
 # A simple function to remove HTML tags from a string.
 # You can of course also use some fancy library. In particular, lxml (http://lxml.de/) seems a simple and good solution; also for getting rid of javascript.
-def remove_html_markup(s):
-    tag = False
-    quote = False
-    out = ""
-    # for all characters in string s
-    for c in s:
-        if c == '<' and not quote:
-            tag = True
-        elif c == '>' and not quote:
-            tag = False
-        elif (c == '"' or c == "'") and tag:
-            quote = not quote
-        elif not tag:
-            out = out + c
-    # return stripped string
-    return out
+# def remove_html_markup(s):
+#     tag = False
+#     quote = False
+#     out = ""
+#     # for all characters in string s
+#     for c in s:
+#         if c == '<' and not quote:
+#             tag = True
+#         elif c == '>' and not quote:
+#             tag = False
+#         elif (c == '"' or c == "'") and tag:
+#             quote = not quote
+#         elif not tag:
+#             out = out + c
+#     # return stripped string
+#     return out
 #lxml
 def sanitize(dirty_html):
     cleaner = Cleaner(page_structure=True,
@@ -55,8 +54,8 @@ def sanitize(dirty_html):
                   annoying_tags=True,
                   remove_unknown_tags=True,
                   safe_attrs_only=True,
-                  safe_attrs=frozenset(['src','color', 'href', 'title', 'class', 'name', 'id']),
-                  remove_tags=('span', 'font', 'div')
+                  #safe_attrs=frozenset(['src','color', 'href', 'title', 'class', 'name', 'id']),
+                  remove_tags=('span', 'font', 'div', 'p', 'ul', 'td', 'th', 'tr', 'li', 'a')
                   )
     return cleaner.clean_html(dirty_html)
 
@@ -71,30 +70,23 @@ if __name__ == '__main__':
     term_list = []
 
     # read artist names from file
-    artists = Wikipedia_Fetcher.read_file(Wikipedia_Fetcher.ARTISTS_FILE)   # using functions and parameters defined in Wikipedia_Fetcher
+    artists = Wikipedia_Fetcher.read_file(Wikipedia_Fetcher.IDX_ARTISTS_FILE)   # using functions and parameters defined in Wikipedia_Fetcher
+    artists_len = len(artists)
 
     # for all artists
-    #for i in range(0, len(artists)):
-    for i in range(0, 1):
-        # construct file name to fetched HTML page for current artist, depending on parameter settings in Wikipedia_Fetcher.py
-        if Wikipedia_Fetcher.USE_INDEX_IN_OUTPUT_FILE:
-            html_fn = Wikipedia_Fetcher.OUTPUT_DIRECTORY + "/" + str(i) + ".html"     # target file name
-        elif not Wikipedia_Fetcher.USE_INDEX_IN_OUTPUT_FILE:
-            html_fn = Wikipedia_Fetcher.OUTPUT_DIRECTORY + "/" + urllib.quote(artists[i]) + ".html"     # target file name
+    for i in range(0, len(artists)):
+    #for i in range(0, 2):
+        # construct file name to fetched HTML page for current artist, depending on parameter settings in Wikipedia_Fetcher
+        html_fn = Wikipedia_Fetcher.OUTPUT_DIRECTORY + "/" + artists[i][0] + ".html"     # target file name
 
         # Load fetched HTML content if target file exists
         if os.path.exists(html_fn):
             # Read entire file
             html_content = open(html_fn, 'r').read()
-            print(html_content)
 
             # Next we perform some text processing:
             # Strip content off HTML tags
-            #content_tags_removed = remove_html_markup(html_content)
             content_tags_removed = sanitize(html_content)
-            print("#########################")
-            print(content_tags_removed)
-
             # Perform case-folding, i.e., convert to lower case
             content_casefolded = content_tags_removed.lower()
             # Tokenize stripped content at white space characters
@@ -122,15 +114,18 @@ if __name__ == '__main__':
             else:
                 terms_df[t] += 1
 
+
     # Compute number of artists/documents and terms
-    no_artists = len(html_contents.items())
+    #no_artists = len(html_contents.items())
+    no_artists = artists_len
     no_terms = len(terms_df)
     print "Number of artists in corpus: " + str(no_artists)
     print "Number of terms in corpus: " + str(no_terms)
 
-    # You may want (or need) to perform some kind of dimensionality reduction here, e.g., filtering all terms
-    # with a very small document frequency.
-    # ...
+    # You may want (or need) to perform some kind of dimensionality reduction here, e.g., filtering all terms with a very small document frequency.
+    # ... TODO
+    #term_list = filter(lambda t: terms_df[t] != 1, terms_df)       #wirft spaeter out of range
+    #print len(term_list)
 
 
     # Dictionary is unordered, so we store all terms in a list to fix their order, before computing the TF-IDF matrix
@@ -149,6 +144,7 @@ if __name__ == '__main__':
     # Iterate over all (artist, terms) tuples to determine all term frequencies TF_{artist,term}
     terms_index_lookup = {}         # lookup table for indices (for higher efficiency)
     for a_idx, terms in html_contents.items():
+
         print "Computing term weights for artist " + str(a_idx)
         # You may want (or need) to make the following more efficient.
         for t in terms:                     # iterate over all terms of current artist
