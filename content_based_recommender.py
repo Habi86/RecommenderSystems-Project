@@ -55,8 +55,16 @@ def recommend_CB(artist_indizes, K, number_of_recommendations):
     for aidx in artist_indizes:
         dict_recommended_artists_idx.pop(aidx, None)            # drop (key, value) from dictionary if key (i.e., aidx) exists; otherwise return None
 
+
+    recommended_artists_idx = sorted(dict_recommended_artists_idx, key=dict_recommended_artists_idx.get, reverse=True)
+    #print dict_recommended_artists_idx
+
+    recommended_items = recommended_artists_idx[0:number_of_recommendations]
+
+    #raise "X"
+
     # Return dictionary of recommended artist indices (and scores)
-    return dict_recommended_artists_idx
+    return recommended_items
 
 
 

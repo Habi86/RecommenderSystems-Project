@@ -37,8 +37,7 @@ def evaluation_framework(method):
     f1_array = []
     tp_array = []
     # sample_users = random.sample(range(0, UAM.shape[0]), 15)
-    sample_users = range(20, 25)
-
+    sample_users =     range(30, 35)
 
     for number_recommended_items in recommended_items_list:
         
@@ -104,7 +103,7 @@ def evaluation_framework(method):
                 elif method == "RB_U":
                     recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
                 elif method == "CB":
-                    recommended_artists = content_based_recommender.recommend_CB(AAM, user_row[train], K, number_recommended_items)
+                    recommended_artists = content_based_recommender.recommend_CB(user_row[train], K, number_recommended_items)
 
 
 

@@ -7,7 +7,6 @@
 # Finally, build a content-based recommender using the similarity matrix created.
 
 # Wikipedia fetcher to download "music context" data for a given artist list.
-__author__ = 'Markus Schedl' # modified
 
 # Load required modules
 import os
