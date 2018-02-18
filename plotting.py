@@ -31,7 +31,9 @@ def plot_precision_recall():
     precision_recall_plot.plot(recall_cb, precision_cb)
 
     plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB'], loc='upper right')
-    plt1.savefig('./plots/CB_precision-recall_2.png')
+    precision_recall_plot.set_xlabel('Recall')
+    precision_recall_plot.set_ylabel('Precision')
+    plt1.savefig('./plots/precision-recall_mit_cb.png')
 
 def plot_f1():
   number_recommended_artists = range(10, 200, 10)
@@ -51,8 +53,10 @@ def plot_f1():
   f1_plot.plot(number_recommended_artists, f1_rb_a)
   f1_plot.plot(number_recommended_artists, f1_cb)
 
+  f1_plot.set_xlabel('number of recommended items')
+  f1_plot.set_ylabel('F1')
   plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB'], loc='upper right')
-  plt1.savefig('./plots/CB_f1_2.png')
+  plt1.savefig('./plots/f1_mit_cb.png')
 
 
 plot_precision_recall()
