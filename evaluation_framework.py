@@ -11,6 +11,7 @@ import collaborative_filtering
 import popularity_based_recommender
 import content_based_recommender
 import hybrid_CF_PB
+import hybrid_CF_CB
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
@@ -102,6 +103,8 @@ def evaluation_framework(method):
                     recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
                 elif method == "CB":
                     recommended_artists = content_based_recommender.recommend_CB(user_row[train], K, number_recommended_items)
+                elif method == "CF_CB":
+                    recommended_artists = hybrid_CF_CB.recommend_CF_CB(user, user_row[train], amount_artists, train_UAM, K, number_recommended_items)
 
 
 
@@ -200,7 +203,7 @@ def evaluation_framework(method):
 
 
 # plot_precision_recall()
-evaluation_framework("CF_PB")
+evaluation_framework("CF_CB")
 
 
 # CF:
