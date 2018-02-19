@@ -11,7 +11,7 @@ import popularity_based_recommender
 
 def recommend_CF_PB(user, UAM, K, number_recommended_items):
   cf_artist_indizes = collaborative_filtering.recommend_CF(user, UAM, K, 100)
-  pb_artist_indizes = popularity_based_recommender.recommend_PB(UAM, 100)
+  pb_artist_indizes = popularity_based_recommender.recommend_PB(UAM, user, 100)
 
   ranked_indizes_dictionary = defaultdict(list)
 
