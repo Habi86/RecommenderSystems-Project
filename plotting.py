@@ -34,10 +34,15 @@ def plot_precision_recall():
     precision_recall_plot.plot(recall_cb, precision_cb)
     precision_recall_plot.plot(recall_cf_cb, precision_cf_cb)
 
-    plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], prop={'size': 8}, loc='upper right')
+    plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], prop={'size': 10}, loc=9, bbox_to_anchor=(0.5, -0.3), fancybox=True, shadow=True, ncol=7)
     precision_recall_plot.set_xlabel('Recall')
     precision_recall_plot.set_ylabel('Precision')
-    plt1.savefig('./plots/precision-recall_3 .png')
+    plt1.savefig('./plots/precision-recall_final.png')
+
+
+
+
+
 
 def plot_f1():
   number_recommended_artists = range(10, 200, 10)
@@ -61,8 +66,8 @@ def plot_f1():
 
   f1_plot.set_xlabel('number of recommended items')
   f1_plot.set_ylabel('F1')
-  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], prop={'size': 8}, loc='upper right')
-  plt1.savefig('./plots/f1_3.png')
+  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], prop={'size': 10}, loc=9, bbox_to_anchor=(0.5, -0.3), fancybox=True, shadow=True, ncol=7)
+  plt1.savefig('./plots/f1_final.png')
 
 
 def plot_cold_start_f1():
@@ -94,9 +99,8 @@ def plot_cold_start_f1():
   plt1.savefig('./plots/cold-start-f1-pb.png')
 
 
-
-#plot_precision_recall()
-#plot_f1()
+plot_precision_recall()
+plot_f1()
 
 # [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751]
 
@@ -107,5 +111,5 @@ def plot_cold_start_f1():
 # [169, 611, 108, 388, 636, 889, 149, 721, 382, 237, 115, 581, 75, 1019, 391]
 
 
-plot_cold_start_f1()
+#plot_cold_start_f1()
 
