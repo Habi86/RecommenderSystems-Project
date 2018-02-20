@@ -229,8 +229,8 @@ def cold_start_evaluation(method):
         # print "user: "
         # print user
         
-        # print "playcounts array len: "
-        # print len(user_playcounts_array)
+        print "playcounts array len: "
+        print len(user_playcounts_array)
 
         user_playcount = np.sum(UAM[user, :])
 
@@ -248,7 +248,6 @@ def cold_start_evaluation(method):
             train_UAM[user, test] = 0.0
             
 
-
             if method == "CF":
                 recommended_artists = collaborative_filtering.recommend_CF(user, train_UAM, K, number_recommended_items)
             elif method == "PB":
@@ -261,13 +260,13 @@ def cold_start_evaluation(method):
             elif method == "RB_U":
                 recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
             elif method == "CB":
-                recommended_artists = content_based_recommender.recommend_CB(user, train_UAM,  number_recommended_items, K)
-
+                # recommended_artists = content_based_recommender.recommend_CB(user, train_UAM,  number_recommended_items, K)
+                recommended_artists = content_based_recommender.recommend_CB(user_row[train], K, number_recommended_items)
+            elif method == "CF_CB":
+                recommended_artists = hybrid_CF_CB.recommend_CF_CB(user, user_row[train], amount_artists, train_UAM, K, number_recommended_items)
 
             # recommended_artists = np.array(recommended_artists)
-
             correct_predicted_artists = np.intersect1d(user_row[test], recommended_artists)
-
             true_positives = len(correct_predicted_artists)
             # tp = tp + true_positives
 
@@ -287,53 +286,14 @@ def cold_start_evaluation(method):
             avg_precision += precision / (NF)
             avg_recall += recall / (NF)
             summed_user_playcounts += user_playcount
-            
 
-        
-    
-        
-        
-        
-        # rec_array.append(avg_recall)
-        # prec_array.append(avg_precision)
-        # print "user_playcount: "
-        # print np.sum(UAM[user, :])
-        
-        
-        # print "prec_array"
-        # print prec_array
-        # print "rec_array"
-        # print rec_array
-        # print "f1_array"
-        # print f1_array
-        # count += 1
-        # print "count: "
-        # print count
+
         user_count += 1
         if user_playcount > (20000 * (len(user_playcounts_array)+1)):
             avg_precision = avg_precision / user_count
             avg_recall = avg_recall / user_count
             if (avg_precision + avg_recall) != 0: f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
             else: f1_measure = 0.0
-            print ""
-            print "avg precision: "
-            print avg_precision
-            print "avg recall: "
-            print avg_recall
-            print ""
-
-            print "user playcount: "
-            print user_playcount
-            print "blubbidiblubb: "
-            print (20000 * (len(user_playcounts_array)+1))
-
-
-            # avg precision:
-            # 301.0
-            # avg recall:
-            # 582.852062696
-
-
 
             user_playcounts_array.append(user_playcount / user_count)
             f1_array.append(f1_measure)
@@ -344,16 +304,13 @@ def cold_start_evaluation(method):
             f1_measure = 0.0
 
     
-
-    # np.savetxt('./plots/data/cold-start/'+method+'_precision.txt', prec_array, delimiter=',')
-    # np.savetxt('./plots/data/cold-start/'+method+'_recall.txt', rec_array, delimiter=',')
     np.savetxt('./plots/data/cold-start/'+method+'_f1.txt', f1_array, delimiter=',')
-    np.savetxt('./plots/data/cold-start/'+method+'_user_playcounts.txt', user_playcounts_array, delimiter=',')
+    np.savetxt('./plots/data/cold-start/user_playcounts.txt', user_playcounts_array, delimiter=',')
     print "Done saving to file"
 
 
 
-cold_start_evaluation("RB_U")
+cold_start_evaluation("CB")
 
 
 
