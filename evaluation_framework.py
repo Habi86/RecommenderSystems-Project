@@ -59,7 +59,7 @@ def evaluation_framework(method):
             # print "len user_row: "
             # print user_row
 
-            if len(user_row)< 10: continue
+            if len(user_row)< K: continue
 
             # kf = KFold(n_splits=NF)
             # for train, test in kf.split(user_row):
@@ -104,7 +104,7 @@ def evaluation_framework(method):
                 elif method == "RB_U":
                     recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
                 elif method == "CB":
-                    recommended_artists = content_based_recommender.recommend_CB(AAM, user_row[train], K, number_recommended_items)
+                    recommended_artists = content_based_recommender.recommend_CB(user, train_UAM,  number_recommended_items, K)
 
 
 
@@ -203,11 +203,158 @@ def evaluation_framework(method):
 
 
 # plot_precision_recall()
-evaluation_framework("CB")
+# evaluation_framework("CF_PB")
 
 
-# CF:
-# K = 3: 
-# PRECISION LIST: 
-# python evaluation_framework.py > ergebnisse_CF_5.txt
+def cold_start_evaluation(method):
+    number_recommended_items = 50
+    # prec_array = []
+    # rec_array = []
+    f1_array = []
+    user_playcounts_array = []
+
+    avg_precision = 0.0       # mean precision
+    avg_recall = 0.0        # mean recall
+    avg_user_playcount = 0
+    user_count = 0
+    summed_user_playcounts = 0
+    # f1_measure = 0.0
+
+    summed_user_playcounts = np.sum(UAM, axis=1)
+    sorted_user_indizes = np.argsort(summed_user_playcounts)
+
+   
+
+    for user in sorted_user_indizes:
+        # print "user: "
+        # print user
+        
+        # print "playcounts array len: "
+        # print len(user_playcounts_array)
+
+        user_playcount = np.sum(UAM[user, :])
+
+        # print "playcounts: "
+        print user_playcount
+
+        user_row = np.nonzero(UAM[user, :])[0]
+
+        if len(user_row) < K: continue
+
+        folds = cross_validation.KFold(len(user_row), n_folds=NF)
+        for train, test in folds:
+
+            train_UAM = UAM.copy()
+            train_UAM[user, test] = 0.0
+            
+
+
+            if method == "CF":
+                recommended_artists = collaborative_filtering.recommend_CF(user, train_UAM, K, number_recommended_items)
+            elif method == "PB":
+                recommended_artists = popularity_based_recommender.recommend_PB(train_UAM, user, number_recommended_items)
+            elif method == "CF_PB":
+                recommended_artists = hybrid_CF_PB.recommend_CF_PB(user, train_UAM, K, number_recommended_items)
+            elif method == "RB_A":
+                recommended_artists = baseline_recommenders.recommend_RB_artist(train_UAM, user, number_recommended_items)
+
+            elif method == "RB_U":
+                recommended_artists = baseline_recommenders.recommend_RB_user(user, train_UAM, number_recommended_items, K)
+            elif method == "CB":
+                recommended_artists = content_based_recommender.recommend_CB(user, train_UAM,  number_recommended_items, K)
+
+
+            # recommended_artists = np.array(recommended_artists)
+
+            correct_predicted_artists = np.intersect1d(user_row[test], recommended_artists)
+
+            true_positives = len(correct_predicted_artists)
+            # tp = tp + true_positives
+
+            # wenn kein einziger artist empfohlen wird, precision = 100%
+            if(len(recommended_artists) == 0):
+                precision = 100.0
+            else:
+                precision = 100.0 * true_positives / len(recommended_artists)
+
+            # wenn kein einziger artist im test set vorkommt, recall = 100%
+            if(len(test) == 0):
+                recall = 100.0
+            else:
+                recall = 100.0 * true_positives / len(test)
+
+            # add precision and recall for current user and fold to aggregate variables
+            avg_precision += precision / (NF)
+            avg_recall += recall / (NF)
+            summed_user_playcounts += user_playcount
+            
+
+        
+    
+        
+        
+        
+        # rec_array.append(avg_recall)
+        # prec_array.append(avg_precision)
+        # print "user_playcount: "
+        # print np.sum(UAM[user, :])
+        
+        
+        # print "prec_array"
+        # print prec_array
+        # print "rec_array"
+        # print rec_array
+        # print "f1_array"
+        # print f1_array
+        # count += 1
+        # print "count: "
+        # print count
+        user_count += 1
+        if user_playcount > (20000 * (len(user_playcounts_array)+1)):
+            avg_precision = avg_precision / user_count
+            avg_recall = avg_recall / user_count
+            if (avg_precision + avg_recall) != 0: f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
+            else: f1_measure = 0.0
+            print ""
+            print "avg precision: "
+            print avg_precision
+            print "avg recall: "
+            print avg_recall
+            print ""
+
+            print "user playcount: "
+            print user_playcount
+            print "blubbidiblubb: "
+            print (20000 * (len(user_playcounts_array)+1))
+
+
+            # avg precision:
+            # 301.0
+            # avg recall:
+            # 582.852062696
+
+
+
+            user_playcounts_array.append(user_playcount / user_count)
+            f1_array.append(f1_measure)
+            summed_user_playcounts = 0
+            user_count = 0
+            avg_precision = 0.0
+            avg_recall = 0.0
+            f1_measure = 0.0
+
+    
+
+    # np.savetxt('./plots/data/cold-start/'+method+'_precision.txt', prec_array, delimiter=',')
+    # np.savetxt('./plots/data/cold-start/'+method+'_recall.txt', rec_array, delimiter=',')
+    np.savetxt('./plots/data/cold-start/'+method+'_f1.txt', f1_array, delimiter=',')
+    np.savetxt('./plots/data/cold-start/'+method+'_user_playcounts.txt', user_playcounts_array, delimiter=',')
+    print "Done saving to file"
+
+
+
+cold_start_evaluation("RB_U")
+
+
+
 
