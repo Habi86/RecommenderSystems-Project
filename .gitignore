@@ -14,3 +14,5 @@ LFM1b_users.txt
 .vscode/
 *.txt
 visualisations/.Rhistory
+
+plots/
