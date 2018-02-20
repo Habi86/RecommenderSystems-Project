@@ -94,7 +94,5 @@ if __name__ == '__main__':
         if "Wikipedia does not have an article with this exact name" not in html_content:
             if "may refer to" not in html_content:
                 if "Genres" in html_content:
-                    # write to output file
-                    #print "Storing content to " + html_fn
                     with open(html_fn, 'w') as f:
                         f.write(html_content)
