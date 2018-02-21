@@ -2,6 +2,7 @@ import numpy as np
 from collections import defaultdict
 import collaborative_filtering
 import popularity_based_recommender
+import scipy.spatial.distance as scidist        # import distance computation module from scipy package
 
 
 def recommend_CF_PB(user, UAM, K, number_recommended_items):
@@ -21,5 +22,3 @@ def recommend_CF_PB(user, UAM, K, number_recommended_items):
     ranked_indizes = sorted(ranked_indizes_dictionary, key=ranked_indizes_dictionary.get)
 
   return ranked_indizes[0:number_recommended_items]
-
-

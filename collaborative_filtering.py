@@ -1,6 +1,7 @@
 # Load required modules
 import numpy as np
 from collections import defaultdict
+import scipy.spatial.distance as scidist        # import distance computation module from scipy package
 
 
 

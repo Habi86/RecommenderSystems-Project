@@ -58,10 +58,6 @@ def plot_single_precision_recall():
     precision_recall_plot.set_ylabel('Precision')
     plt1.savefig('./plots/RB_A_precision-recall_final.png')
 
-
-
-
-
 def plot_f1():
   number_recommended_artists = range(10, 200, 10)
   f1_pb = np.loadtxt('./plots/data/PB_f1.txt', delimiter=',')
@@ -121,22 +117,12 @@ def plot_cold_start_f1():
   f1_plot.plot(user_playcounts, f1_rb_u, 'o')
   f1_plot.plot(user_playcounts, f1_rb_a, 'o')
   f1_plot.plot(user_playcounts, f1_cb, 'o')
-  f1_plot.plot(user_playcounts, f1_cf_cb, 'o')
-  
-  
-  
+  f1_plot.plot(user_playcounts, f1_cf_cb, 'x')
 
   f1_plot.set_xlabel('amount of playcounts')
-  f1_plot.set_ylabel('F1')
-  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], loc='upper right')
+  f1_plot.set_ylabel('F1 measure')
+  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], prop={'size': 10}, loc=9, bbox_to_anchor=(0.5, -0.3), fancybox=True, shadow=True, ncol=7)
   plt1.savefig('./plots/data/cold-start/10000/f1.png')
-
-
-#plot_precision_recall()
-#plot_f1()
-
-plot_single_precision_recall()
-plot_single_f1()
 
 # [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751]
 
@@ -147,5 +133,5 @@ plot_single_f1()
 # [169, 611, 108, 388, 636, 889, 149, 721, 382, 237, 115, 581, 75, 1019, 391]
 
 
-#plot_cold_start_f1()
+plot_cold_start_f1()
 
