@@ -24,9 +24,6 @@ def recommend_CB(artist_indizes, K, number_of_recommendations):
     # Sort AAM column-wise for each row
     sort_artist_indizes = np.argsort(AAM[artist_indizes, :], axis=1)
 
-
-
-
     # Select the K closest artists to all artists the seed user listened to
     similar_neighbor_artists_indizes = sort_artist_indizes[:,-1-K:-1]
 

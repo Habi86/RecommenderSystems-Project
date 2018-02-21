@@ -27,6 +27,9 @@ UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 
 amount_artists = UAM.shape[1]
 
+#sample_users = random.sample(range(0, UAM.shape[0]), 15)
+sample_users = [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751]
+
 K = 10 # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
 recommended_items_list = range(10, 200, 10)
@@ -35,8 +38,6 @@ def evaluation_framework(method):
     rec_array = []
     f1_array = []
     tp_array = []
-    #sample_users = random.sample(range(0, UAM.shape[0]), 15)
-    sample_users =     range(20, 35)
 
     for number_recommended_items in recommended_items_list:
 
@@ -45,10 +46,10 @@ def evaluation_framework(method):
         tp = 0
         
         for user in sample_users:
-            print "number recommended items: "
-            print number_recommended_items
-            print "user: "
-            print user
+            # print "number recommended items: "
+            # print number_recommended_items
+            # print "user: "
+            # print user
 
             user_row = np.nonzero(UAM[user, :])[0] # len = variabel
 
@@ -80,6 +81,33 @@ def evaluation_framework(method):
                     recommended_artists = content_based_recommender.recommend_CB(user_row[train], K, number_recommended_items)
                 elif method == "CF_CB":
                     recommended_artists = hybrid_CF_CB.recommend_CF_CB(user, user_row[train], amount_artists, train_UAM, K, number_recommended_items)
+
+                # print recommended_artists
+                # recommended_artists = np.array(recommended_artists)
+                # print recommended_artists
+
+                # print np.nonzero(UAM[user, :])[0]
+                # print user_row[test]
+                # raise "x"
+
+                # print "recommended_artists: "
+                # print recommended_artists
+
+                # print "UAM test: "
+                # print UAM[user, test]
+
+                # print "len user_row: "
+                # print len(user_row)
+                # print "user row: "
+                # print user_row
+                # print "train: "
+                # print train
+                # print "test: "
+                # print test
+                # print "user_row[test]"
+                # print user_row[test]
+
+
                 
                 correct_predicted_artists = np.intersect1d(user_row[test], recommended_artists)
 
@@ -111,20 +139,21 @@ def evaluation_framework(method):
         prec_array.append(avg_precision)
         tp_array.append(tp)
 
-        print "average precision: "
-        print prec_array
-        print "average recall: "
-        print rec_array
-        print "average f1: "
-        print f1_array
-        print "tp_array: "
-        print tp_array
+        # print "average precision: "
+        # print prec_array
+        # print "average recall: "
+        # print rec_array
+        # print "average f1: "
+        # print f1_array
+        # print "tp_array: "
+        # print tp_array
 
     
     np.savetxt('./plots/data/'+method+'_precision.txt', prec_array, delimiter=',')
     np.savetxt('./plots/data/'+method+'_recall.txt', rec_array, delimiter=',')
     np.savetxt('./plots/data/'+method+'_f1.txt', f1_array, delimiter=',')
     print "Done saving to file"
+    print method
 
 # evaluation_framework("CF_PB")
 
@@ -245,6 +274,20 @@ def cold_start_evaluation(method):
 
 cold_start_evaluation("PB")
 
+# plot_precision_recall()
+evaluation_framework("RB_A")
+evaluation_framework("RB_U")
+evaluation_framework("CF")
+evaluation_framework("CB")
+evaluation_framework("PB")
+evaluation_framework("CF_PB")
+evaluation_framework("CF_CB")
+
+#cold_start_evaluation("CB")
+
+
+print("######## SAMPLE USER")
+print(sample_users)
 
 
 
