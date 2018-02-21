@@ -1,7 +1,5 @@
 # Load required modules
-import csv
 import numpy as np
-from sklearn import cross_validation            # machine learning & evaluation module
 import random
 
 def recommend_RB_artist(UAM, user, number_recommended_items):
