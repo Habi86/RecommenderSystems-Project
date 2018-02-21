@@ -18,20 +18,20 @@ from sklearn.model_selection import KFold
 # Parameters
 ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
-ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"    # artist names for UAM
-USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
+ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"       # artist names for UAM
+USERS_FILE = ROOT_DIR + "LFM1b_users.txt"           # user names for UAM
 
 
-NF = 10              # number of folds to perform in cross-validation
+NF = 10                                             # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 
 amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
 
-#sample_users = random.sample(range(0, UAM.shape[0]), 15)
-sample_users = [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751]
+sample_users = random.sample(range(0, UAM.shape[0]), 15)
+#sample_users = [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751] # = random users with best result
 
-K = 10 # number of neighbours
+K = 10                                              # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
 recommended_items_list = range(10, 200, 10)
 def evaluation_framework(method):
@@ -205,7 +205,7 @@ def cold_start_evaluation(method):
     user_playcounts_array = []
 
     avg_precision = 0.0       # mean precision
-    avg_recall = 0.0        # mean recall
+    avg_recall = 0.0          # mean recall
     avg_user_playcount = 0
     user_count = 0
     summed_user_playcounts = 0
@@ -214,18 +214,17 @@ def cold_start_evaluation(method):
     summed_user_playcounts = np.sum(UAM, axis=1)
     sorted_user_indizes = np.argsort(summed_user_playcounts)
 
-   
 
     for user in sorted_user_indizes:
-        # print "user: "
-        # print user
+        print "user: "
+        print user
         
         print "playcounts array len: "
         print len(user_playcounts_array)
 
         user_playcount = np.sum(UAM[user, :])
 
-        # print "playcounts: "
+        print "playcounts: "
         print user_playcount
 
         user_row = np.nonzero(UAM[user, :])[0]
@@ -280,7 +279,7 @@ def cold_start_evaluation(method):
 
 
         user_count += 1
-        if user_playcount > (20000 * (len(user_playcounts_array)+1)):
+        if user_playcount > (10000 * (len(user_playcounts_array)+1)):
             avg_precision = avg_precision / user_count
             avg_recall = avg_recall / user_count
             if (avg_precision + avg_recall) != 0: f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
@@ -302,7 +301,7 @@ def cold_start_evaluation(method):
 
 
 
-# plot_precision_recall()
+#plot_precision_recall()
 evaluation_framework("RB_A")
 evaluation_framework("RB_U")
 evaluation_framework("CF")
@@ -311,11 +310,10 @@ evaluation_framework("PB")
 evaluation_framework("CF_PB")
 evaluation_framework("CF_CB")
 
-#cold_start_evaluation("CB")
+cold_start_evaluation("CF_CB")
 
-
-print("######## SAMPLE USER")
-print(sample_users)
+#print("######## SAMPLE USER")
+#print(sample_users)
 
 
 
