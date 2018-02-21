@@ -3,7 +3,7 @@ import numpy as np
 
 ROOT_DIR = "./data/"
 AAM_FILE = ROOT_DIR + "wikipedia/AAM.txt"
-AAM = np.loadtxt(AAM_FILE, delimiter='\t', dtype=np.float32)                
+# AAM = np.loadtxt(AAM_FILE, delimiter='\t', dtype=np.float32)                
 
 def recommend_CB(artist_indizes, K, number_of_recommendations):
 

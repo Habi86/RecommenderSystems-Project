@@ -1,10 +1,5 @@
 import numpy as np
-from sklearn import cross_validation  # machine learning & evaluation module
-import random
-import scipy.spatial.distance as scidist  # import distance computation module from scipy package
-from operator import itemgetter  # for sorting dictionaries w.r.t. values
 from collections import defaultdict
-
 import collaborative_filtering
 import popularity_based_recommender
 
@@ -14,7 +9,6 @@ def recommend_CF_PB(user, UAM, K, number_recommended_items):
   pb_artist_indizes = popularity_based_recommender.recommend_PB(UAM, user, 100)
 
   ranked_indizes_dictionary = defaultdict(list)
-
   
   for cf_index, value in enumerate(cf_artist_indizes):
     pb_index = np.where(pb_artist_indizes == value)[0]

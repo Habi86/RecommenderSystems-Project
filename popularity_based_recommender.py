@@ -1,15 +1,4 @@
-# Implementation of a simple evaluation framework for recommender systems algorithms.
-# This script further implements different recommenders: collaborative filtering,
-# content-based recommendation, random recommendation, popularity-based recommendation, and
-# hybrid methods (score-based and rank-based fusion).
-
-
-# Load required modules
 import numpy as np
-from sklearn import cross_validation  # machine learning & evaluation module
-import random
-import scipy.spatial.distance as scidist  # import distance computation module from scipy package
-from operator import itemgetter  # for sorting dictionaries w.r.t. values
 
 def recommend_PB(UAM, user, number_of_recommendations):
     listening_events_per_artist = np.sum(UAM, axis=0)                           
@@ -38,21 +27,3 @@ def recommend_PB(UAM, user, number_of_recommendations):
 
     #     if len(recommended_artists) == number_of_recommendations: break
     # return recommended_artists
-
-
-
-
-
-
-    # return [42, 260, 217, 43, 590, 268, 19, 3788, 228, 2792]
-
-
-
-
-    # return [42, 260, 217, 43, 590, 268, 19, 3788, 228, 2792]
-    # return [  42  260  217   43  590  268   19 3788  228 2792]
-
-
-
-#  [42, 260, 217, 590, 19, 3788, 2792, 298, 20, 2646] nur unknown user
-#  [  42  260  217   43  590  268   19 3788  228 2792]
