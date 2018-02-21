@@ -1,7 +1,5 @@
 # Load required modules
-import csv
 import numpy as np
-from sklearn import cross_validation            # machine learning & evaluation module
 import random
 
 def recommend_RB_artist(UAM, user, number_recommended_items):
@@ -13,9 +11,6 @@ def recommend_RB_artist(UAM, user, number_recommended_items):
 
 
 def recommend_RB_user(user, UAM, number_recommended_items, K):
-    user_row = UAM[user, :]
-    unknown_artists_of_user = np.where(user_row == 0)[0]
-
     random_users = random.sample(range(0,UAM.shape[0]), K)
     artists_of_random_users = np.nonzero(UAM[random_users,:])[1]
 

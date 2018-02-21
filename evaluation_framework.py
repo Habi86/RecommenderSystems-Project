@@ -17,19 +17,19 @@ import hybrid_CF_CB
 # Parameters
 ROOT_DIR = "./data/"
 UAM_FILE = ROOT_DIR + "C1ku_UAM.txt"                # user-artist-matrix (UAM)
-ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"    # artist names for UAM
-USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
+ARTISTS_FILE = ROOT_DIR + "LFM1b_artists.txt"       # artist names for UAM
+USERS_FILE = ROOT_DIR + "LFM1b_users.txt"           # user names for UAM
 
 
-NF = 10              # number of folds to perform in cross-validation
+NF = 10                                             # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 
 amount_artists = UAM.shape[1]
 
-#sample_users = random.sample(range(0, UAM.shape[0]), 15)
-sample_users = [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751]
+sample_users = random.sample(range(0, UAM.shape[0]), 15)
+#sample_users = [210, 522, 235, 207, 475, 76, 650, 362, 227, 582, 396, 1052, 492, 1032, 751] # = random users with best result
 
-K = 10 # number of neighbours
+K = 10                                              # number of neighbours
 # recommended_items_list = [5, 10, 15, 25, 50, 75, 100, 500]
 recommended_items_list = range(10, 200, 10)
 def evaluation_framework(method):
@@ -111,7 +111,7 @@ def cold_start_evaluation(method):
     user_playcounts_array = []
 
     avg_precision = 0.0       # mean precision
-    avg_recall = 0.0        # mean recall
+    avg_recall = 0.0          # mean recall
     avg_user_playcount = 0
     user_count = 0
     user_playcounts_sum = 0
