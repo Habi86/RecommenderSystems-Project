@@ -25,8 +25,6 @@ USERS_FILE = ROOT_DIR + "LFM1b_users.txt"        # user names for UAM
 NF = 10              # number of folds to perform in cross-validation
 UAM = np.loadtxt(UAM_FILE, delimiter='\t', dtype=np.float32)
 
-
-amount_users = UAM.shape[0]
 amount_artists = UAM.shape[1]
 
 K = 10 # number of neighbours
@@ -52,40 +50,17 @@ def evaluation_framework(method):
             print "user: "
             print user
 
-            # Get seed user's artists listened to
-            # user_row = UAM[user,:] # len = 10122
             user_row = np.nonzero(UAM[user, :])[0] # len = variabel
-            # print "len user_row: "
-            # print user_row
 
             if len(user_row)< K: continue
 
-            # kf = KFold(n_splits=NF)
-            # for train, test in kf.split(user_row):
+
+
             folds = cross_validation.KFold(len(user_row), n_folds=NF)
             for train, test in folds:
-            
-                # np.set_printoptions(threshold=np.nan)
-                # print "test: "
-                # print test
-                # print "user_row: "
-                # print user_row
-                # print len(user_row)
-                # print len(test)
-                # print "user_row[test]"
-                # print user_row[test]
-                
-
+  
                 train_UAM = UAM.copy()
-                train_UAM[user, test] = 0.0
-
-                # print (len(UAM[user, :]) - len(user_row))
-                # print len(np.where(UAM[user, :] == 0)[0])
-
-                # print "train_uam: "
-                # print len(np.where(train_UAM[user, :] == 0)[0])
-                
-
+                train_UAM[user, test] = 0.0          
 
                 if method == "CF":
                     # try: 
@@ -105,54 +80,12 @@ def evaluation_framework(method):
                     recommended_artists = content_based_recommender.recommend_CB(user_row[train], K, number_recommended_items)
                 elif method == "CF_CB":
                     recommended_artists = hybrid_CF_CB.recommend_CF_CB(user, user_row[train], amount_artists, train_UAM, K, number_recommended_items)
-
-
-
-                # print recommended_artists
-                recommended_artists = np.array(recommended_artists)
-                # print recommended_artists
-
-                # print np.nonzero(UAM[user, :])[0]
-                # print user_row[test]
-                # raise "x"
-
-                
-
-                # print "recommended_artists: "
-                # print recommended_artists
-
-                # print "UAM test: "
-                # print UAM[user, test]
-
-                # print "len user_row: "
-                # print len(user_row)
-                # print "user row: "
-                # print user_row
-                # print "train: "
-                # print train
-                # print "test: "
-                # print test
-                # print "user_row[test]"
-                # print user_row[test]
-
-
                 
                 correct_predicted_artists = np.intersect1d(user_row[test], recommended_artists)
-                # correct_predicted_artists = np.intersect1d(train_UAM[user, test], recommended_artists)
-
-
-                # print recommended_artists
-                # print user_row[test]
-                # print np.nonzero(UAM[user, test])[0]
-
 
                 true_positives = len(correct_predicted_artists)
                 tp = tp + true_positives
-                
-
-                # print "true positives: "
-                # print true_positives
-                # print len(recommended_artists)
+   
 
                 # wenn kein einziger artist empfohlen wird, precision = 100%
                 if(len(recommended_artists) == 0):
@@ -160,17 +93,12 @@ def evaluation_framework(method):
                 else:
                     precision = 100.0 * true_positives / len(recommended_artists)
 
-                # print "precision: "
-                # print precision
                 # wenn kein einziger artist im test set vorkommt, recall = 100%
                 if(len(test) == 0):
                     recall = 100.0
                 else:
                     recall = 100.0 * true_positives / len(test)
-                # print "len(test): "
-                # print len(test)
-                # print "recall: "
-                # print recall
+  
                 # add precision and recall for current user and fold to aggregate variables
                 avg_precision += precision / (NF * len(sample_users))
                 avg_recall += recall / (NF * len(sample_users))
@@ -198,12 +126,8 @@ def evaluation_framework(method):
     np.savetxt('./plots/data/'+method+'_f1.txt', f1_array, delimiter=',')
     print "Done saving to file"
 
-
-        
-
-
-# plot_precision_recall()
 # evaluation_framework("CF_PB")
+
 
 
 def cold_start_evaluation(method):
@@ -217,7 +141,7 @@ def cold_start_evaluation(method):
     avg_recall = 0.0        # mean recall
     avg_user_playcount = 0
     user_count = 0
-    summed_user_playcounts = 0
+    user_playcounts_sum = 0
     # f1_measure = 0.0
 
     summed_user_playcounts = np.sum(UAM, axis=1)
@@ -285,32 +209,41 @@ def cold_start_evaluation(method):
             # add precision and recall for current user and fold to aggregate variables
             avg_precision += precision / (NF)
             avg_recall += recall / (NF)
-            summed_user_playcounts += user_playcount
+            user_playcounts_sum += user_playcount
 
 
         user_count += 1
-        if user_playcount > (20000 * (len(user_playcounts_array)+1)):
+        if user_playcount > (10000 * (len(user_playcounts_array)+1)):
             avg_precision = avg_precision / user_count
             avg_recall = avg_recall / user_count
             if (avg_precision + avg_recall) != 0: f1_measure = 2 * ((avg_precision * avg_recall) / (avg_precision + avg_recall))
             else: f1_measure = 0.0
-
-            user_playcounts_array.append(user_playcount / user_count)
+            # if(len(user_playcounts_array) == 1):
+            #     print "summed_user_playcounts"
+            #     print summed_user_playcounts
+            #     print "user_playcount"
+            #     print user_playcount
+            #     print "user_playcounts_array"
+            #     print user_playcounts_array[0]
+            #     raise "x"
+            user_playcounts_array.append(user_playcounts_sum / user_count)
             f1_array.append(f1_measure)
-            summed_user_playcounts = 0
+            user_playcounts_sum = 0
             user_count = 0
             avg_precision = 0.0
             avg_recall = 0.0
             f1_measure = 0.0
 
+    print "user playcounts array: "
+    print user_playcounts_array
     
-    np.savetxt('./plots/data/cold-start/'+method+'_f1.txt', f1_array, delimiter=',')
-    np.savetxt('./plots/data/cold-start/user_playcounts.txt', user_playcounts_array, delimiter=',')
+    # np.savetxt('./plots/data/cold-start/10000/'+method+'_f1_neu.txt', f1_array, delimiter=',')
+    np.savetxt('./plots/data/cold-start/10000/user_playcounts_02.txt', user_playcounts_array, delimiter=',')
     print "Done saving to file"
 
 
 
-cold_start_evaluation("CB")
+cold_start_evaluation("PB")
 
 
 

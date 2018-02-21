@@ -73,32 +73,32 @@ def plot_f1():
 
 
 def plot_cold_start_f1():
-  f1_pb = np.loadtxt('./plots/data/cold-start/PB_f1.txt', delimiter=',')
-  pb_user_playcounts = np.loadtxt('./plots/data/cold-start/PB_user_playcounts.txt', delimiter=',')
-  f1_cf = np.loadtxt('./plots/data/cold-start/CF_f1.txt', delimiter=',')
-  cf_user_playcounts = np.loadtxt('./plots/data/cold-start/CF_user_playcounts.txt', delimiter=',')
-  f1_rb_a = np.loadtxt('./plots/data/cold-start/RB_A_f1.txt', delimiter=',')
-  rb_a_user_playcounts = np.loadtxt('./plots/data/cold-start/RB_A_user_playcounts.txt', delimiter=',')
-
-  # f1_cf_pb = np.loadtxt('./plots/data/CF_PB_f1.txt', delimiter=',')
-  # f1_rb_u = np.loadtxt('./plots/data/RB_U_f1.txt', delimiter=',')
-  
-  # f1_cb = np.loadtxt('./plots/data/CB_f1.txt', delimiter=',')
+  f1_pb = np.loadtxt('./plots/data/cold-start/10000/PB_f1.txt', delimiter=',')
+  f1_cf_pb = np.loadtxt('./plots/data/cold-start/10000/CF_PB_f1.txt', delimiter=',')
+  f1_cf = np.loadtxt('./plots/data/cold-start/10000/CF_f1.txt', delimiter=',')
+  f1_cf_cb = np.loadtxt('./plots/data/cold-start/10000/CF_CB_f1.txt', delimiter=',')
+  f1_cb = np.loadtxt('./plots/data/cold-start/10000/CB_f1.txt', delimiter=',')
+  f1_rb_a = np.loadtxt('./plots/data/cold-start/10000/RB_A_f1.txt', delimiter=',')
+  f1_rb_u = np.loadtxt('./plots/data/cold-start/10000/RB_U_f1.txt', delimiter=',')
+  user_playcounts = np.loadtxt('./plots/data/cold-start/10000/user_playcounts_02.txt', delimiter=',')
 
   plt1 = plt.figure()
   f1_plot = plt1.add_subplot(211)
-  f1_plot.plot(pb_user_playcounts, f1_pb, 'o')
-  f1_plot.plot(cf_user_playcounts, f1_cf, 'o')
-  f1_plot.plot(rb_a_user_playcounts, f1_rb_a, 'o')
-  # f1_plot.plot(number_recommended_artists, f1_cf_pb)
-  # f1_plot.plot(number_recommended_artists, f1_rb_u)
-  # f1_plot.plot(number_recommended_artists, f1_rb_a)
-  # f1_plot.plot(number_recommended_artists, f1_cb)
+  f1_plot.plot(user_playcounts, f1_pb, 'o')
+  f1_plot.plot(user_playcounts, f1_cf, 'o')
+  f1_plot.plot(user_playcounts, f1_cf_pb, 'o')
+  f1_plot.plot(user_playcounts, f1_rb_u, 'o')
+  f1_plot.plot(user_playcounts, f1_rb_a, 'o')
+  f1_plot.plot(user_playcounts, f1_cb, 'o')
+  f1_plot.plot(user_playcounts, f1_cf_cb, 'o')
+  
+  
+  
 
   f1_plot.set_xlabel('amount of playcounts')
   f1_plot.set_ylabel('F1')
-  # plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB'], loc='upper right')
-  plt1.savefig('./plots/cold-start-f1-pb.png')
+  plt.legend(['PB', 'CF', 'CF_PB', 'RB_U', 'RB_A', 'CB', 'CF_CB'], loc='upper right')
+  plt1.savefig('./plots/data/cold-start/10000/f1.png')
 
 
 plot_cold_start_f1()
